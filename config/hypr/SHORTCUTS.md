@@ -159,4 +159,4 @@ The old rofi scripts are still on disk, unbound, purely as rollback.
 
 ## Rollback (if ever needed)
 - Bar: re-enable `exec-once = waybar` and comment `exec-once = qs` in `~/.config/hypr/hyprland.conf` (Waybar config untouched).
-- Hyprland config backup: `~/.config/hypr/hyprland.conf.pre-claude.*`
+- Hyprland config backup: `~/.config/hypr/hyprland.conf.bak`

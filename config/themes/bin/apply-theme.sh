@@ -224,7 +224,7 @@ if [ -f "$FF" ] && command -v jq >/dev/null 2>&1; then
     hex2ansi() { local h="${1#\#}"; printf '38;2;%d;%d;%d' "0x${h:0:2}" "0x${h:2:2}" "0x${h:4:2}"; }
     A_ANSI="$(hex2ansi "$accent")"
     F_ANSI="$(hex2ansi "$fg")"
-    [ -f "$FF.pre-claude.bak" ] || cp "$FF" "$FF.pre-claude.bak"
+    [ -f "$FF.orig.bak" ] || cp "$FF" "$FF.orig.bak"
     tmp="$(mktemp)"
     if jq --arg acc "$A_ANSI" --arg fg2 "$F_ANSI" '
         (.display.color.separator) = $fg2
