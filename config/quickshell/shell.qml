@@ -302,17 +302,36 @@ ShellRoot {
         var h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60)
         return (h > 0 ? h + "h " : "") + m + "m " + (batCharging ? "to full" : "left")
     }
-    // Warn once per crossing, not once per poll.
-    property bool batWarned: false
-    onBatLowChanged: {
-        if (batLow && !batWarned) {
-            batWarned = true
-            root.run("notify-send -u critical 'Battery low' " +
-                     "'" + root.batPct + "% remaining'")
-        } else if (!batLow) {
-            batWarned = false
-        }
+    // Battery warning: ONE notification, with a sound, when the battery drops
+    // to the chosen threshold. It does not repeat. Plugging in, or climbing
+    // back above the threshold, re-arms it for next time.
+    //
+    // "Already warned" is kept across shell reloads, so editing the config while
+    // the battery is low does not make it warn again. A timer checks as well as
+    // the change handlers, so a session that starts with the battery already low
+    // still gets its one warning.
+    PersistentProperties {
+        id: batState
+        reloadableId: "batteryWarning"
+        property bool warned: false
     }
+    function batCheck() {
+        if (!hasBattery || batPct < 0) return
+        if (batCharging || batPct > cfg.batteryWarn) { batState.warned = false; return }
+        if (batState.warned) return
+        batState.warned = true
+        var left = batDetail()
+        root.run("notify-send -u critical -a Battery 'Battery low' " +
+                 cfg.shq(batPct + "%" + (left.length ? ", about " + left : "") + ". Plug in the charger.") + "; " +
+                 "pw-play /usr/share/sounds/freedesktop/stereo/dialog-warning.oga 2>/dev/null || " +
+                 "canberra-gtk-play -i dialog-warning 2>/dev/null")
+    }
+    onBatPctChanged: batCheck()
+    onBatChargingChanged: batCheck()
+    onHasBatteryChanged: batCheck()
+    Timer { interval: 30000; running: true; repeat: true; onTriggered: root.batCheck() }
+    // Shortly after start, once UPower has reported in.
+    Timer { interval: 4000; running: true; onTriggered: root.batCheck() }
 
     // ---- Clock ----
     property string clockText: ""
@@ -1640,10 +1659,13 @@ ShellRoot {
                 Rectangle {
                     id: toast
                     required property var modelData
-                    readonly property bool critical:
-                        ("" + modelData.urgency).toLowerCase().indexOf("critical") >= 0
+                    // Compared as enum values. The old test turned the urgency
+                    // into text and looked for the word "critical", but it prints
+                    // as a number, so nothing was ever treated as critical.
+                    readonly property bool critical: modelData.urgency === NotificationUrgency.Critical
+                    // Urgent toasts (low battery, for one) get twice as long, then go.
                     readonly property int life: critical ? 10000
-                        : ((("" + modelData.urgency).toLowerCase().indexOf("low") >= 0) ? 3000 : 5000)
+                        : (modelData.urgency === NotificationUrgency.Low ? 3000 : 5000)
                     readonly property string app: "" + (modelData.appName || "")
                     width: popupCol.width
                     implicitHeight: Math.max(56, msg.implicitHeight + 24)

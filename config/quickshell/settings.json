@@ -27,5 +27,6 @@
   "paper": 0,
   "mono": 1,
   "kanjiWorkspaces": true,
-  "barHidden": false
+  "barHidden": false,
+  "batteryWarn": 20
 }
