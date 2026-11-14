@@ -1,0 +1,8 @@
+{
+  "bg":        "#141312",
+  "bg_alt":    "#2a2a29",
+  "fg":        "#e3e2e1",
+  "accent":    "#86734b",
+  "accent_fg": "#fff9ee",
+  "urgent":    "#ffb3b0"
+}

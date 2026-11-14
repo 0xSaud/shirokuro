@@ -1,0 +1,12 @@
+{
+  "name": "gruvbox",
+  "label": "Gruvbox",
+  "bg": "#282828",
+  "bg_alt": "#3c3836",
+  "fg": "#ebdbb2",
+  "accent": "#fabd2f",
+  "accent_fg": "#282828",
+  "urgent": "#fb4934",
+  "border_active": "fabd2fee",
+  "border_inactive": "3c3836aa"
+}

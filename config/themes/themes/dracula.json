@@ -1,0 +1,12 @@
+{
+  "name": "dracula",
+  "label": "Dracula",
+  "bg": "#282a36",
+  "bg_alt": "#44475a",
+  "fg": "#f8f8f2",
+  "accent": "#bd93f9",
+  "accent_fg": "#282a36",
+  "urgent": "#ff5555",
+  "border_active": "bd93f9ee",
+  "border_inactive": "44475aaa"
+}

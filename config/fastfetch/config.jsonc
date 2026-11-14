@@ -1,0 +1,39 @@
+// fastfetch — terminal greeting ("ink" look)
+// Logo: ~/.config/fastfetch/logo.png — made from
+// ~/Pictures/Wallpapers/fastfetch1.jpg, cropped square with rounded corners,
+// colours untouched. Earlier pictures are kept beside it: logo.cat-ink.png
+// (ink-toned cat frame with the seal) and logo.orig.png (the original frame).
+//
+// The logo box is 30 x 12 cells ON PURPOSE: a kitty cell here is 10 x 25 px,
+// so 30 x 12 cells is 300 x 300 px, a true square. kitty-direct stretches the
+// picture to fill whatever box it is given, so any other ratio distorts it.
+// If the terminal font or line height changes, keep width = height * 2.5.
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+
+  "logo": {
+    "type": "kitty-direct",
+    "source": "~/.config/fastfetch/logo.png",
+    "width": 30,
+    "height": 12,
+    "padding": { "top": 1, "left": 2, "right": 4 }
+  },
+
+  "display": {
+    "separator": "  ",
+    "color": { "keys": "90", "title": "red", "separator": "90" },
+    "key": { "width": 8 }
+  },
+
+  "modules": [
+    "break",
+    { "type": "title", "color": { "user": "red", "at": "90", "host": "default" } },
+    { "type": "custom", "format": "\u001b[31m━━\u001b[90m━━━━━━━━━━━━━━━━━━━━━━\u001b[0m" },
+
+    { "type": "os",      "key": "os",     "format": "{name} {version-id}" },
+    { "type": "wm",      "key": "wm" },
+    { "type": "shell",   "key": "shell",  "format": "{pretty-name} {version}" },
+    { "type": "terminal","key": "term",   "format": "{pretty-name} {version}" },
+    { "type": "uptime",  "key": "uptime" }
+  ]
+}

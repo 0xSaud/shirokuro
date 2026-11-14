@@ -1,0 +1,12 @@
+{
+  "name": "sadu",
+  "label": "Ink",
+  "bg": "#141313",
+  "bg_alt": "#2b2a29",
+  "fg": "#e4e2e2",
+  "accent": "#ce4539",
+  "accent_fg": "#fff8f6",
+  "urgent": "#ffb3b0",
+  "border_active": "e4e2e2cc",
+  "border_inactive": "363434ff"
+}

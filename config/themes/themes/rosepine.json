@@ -1,0 +1,12 @@
+{
+  "name": "rosepine",
+  "label": "Rosé Pine",
+  "bg": "#191724",
+  "bg_alt": "#26233a",
+  "fg": "#e0def4",
+  "accent": "#ebbcba",
+  "accent_fg": "#191724",
+  "urgent": "#eb6f92",
+  "border_active": "ebbcbaee",
+  "border_inactive": "26233aaa"
+}

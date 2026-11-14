@@ -1,0 +1,12 @@
+{
+  "name": "tokyonight",
+  "label": "Tokyo Night",
+  "bg": "#1a1b26",
+  "bg_alt": "#24283b",
+  "fg": "#c0caf5",
+  "accent": "#7aa2f7",
+  "accent_fg": "#1a1b26",
+  "urgent": "#f7768e",
+  "border_active": "7aa2f7ee",
+  "border_inactive": "24283baa"
+}

@@ -1,0 +1,12 @@
+{
+  "name": "pink",
+  "label": "Pink",
+  "bg": "#1f1126",
+  "bg_alt": "#2d1a35",
+  "fg": "#f5d6e6",
+  "accent": "#ff79c6",
+  "accent_fg": "#1f1126",
+  "urgent": "#ff5577",
+  "border_active": "ff79c6ee",
+  "border_inactive": "2d1a35aa"
+}

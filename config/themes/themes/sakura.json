@@ -1,0 +1,12 @@
+{
+  "name": "sakura",
+  "label": "Sakura",
+  "bg": "#2a1f24",
+  "bg_alt": "#3a2a30",
+  "fg": "#fce4ec",
+  "accent": "#f48fb1",
+  "accent_fg": "#2a1f24",
+  "urgent": "#e57373",
+  "border_active": "f48fb1ee",
+  "border_inactive": "3a2a30aa"
+}

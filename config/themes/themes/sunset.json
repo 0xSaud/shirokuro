@@ -1,0 +1,12 @@
+{
+  "name": "sunset",
+  "label": "Sunset",
+  "bg": "#1d1418",
+  "bg_alt": "#2d1f24",
+  "fg": "#f4e1c1",
+  "accent": "#ff9966",
+  "accent_fg": "#1d1418",
+  "urgent": "#e74c3c",
+  "border_active": "ff9966ee",
+  "border_inactive": "2d1f24aa"
+}

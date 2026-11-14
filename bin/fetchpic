@@ -1,0 +1,259 @@
+#!/usr/bin/env python3
+"""
+fetchpic — change the picture fastfetch shows.
+
+    fetchpic                      pick a picture from ~/Pictures (with preview)
+    fetchpic PATH                 use this picture
+    fetchpic --dir ~/Downloads    pick from another folder
+    fetchpic --focus left PATH    which part to keep when cropping square:
+                                  center (default), left, right, top, bottom
+    fetchpic --ink PATH           black-and-white with the red seal stamped on
+    fetchpic --undo               go back to the picture before the last change
+    fetchpic --list               show the pictures saved so far
+
+An animated GIF stays animated: it is cropped square, saved as logo.gif, and
+fastfetch is switched to kitty's own image viewer (kitty-icat) to play it.
+Animation only shows in the kitty terminal.
+
+The picture is cropped square and written to ~/.config/fastfetch/logo.png.
+The fastfetch logo box is 30x12 terminal cells, which is exactly square at the
+current terminal font, so a square picture is never stretched. Every picture
+that gets replaced is kept in ~/.config/fastfetch/history/.
+"""
+import argparse
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+
+HOME = os.path.expanduser("~")
+FF = os.path.join(HOME, ".config/fastfetch")
+LOGO = os.path.join(FF, "logo.png")
+GIF = os.path.join(FF, "logo.gif")
+CONF = os.path.join(FF, "config.jsonc")
+HIST = os.path.join(FF, "history")
+SEAL = os.path.join(HOME, ".config/quickshell/assets/seal.png")
+EXTS = (".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif")
+SIZE = 600
+
+
+def die(msg):
+    print("fetchpic: " + msg, file=sys.stderr)
+    sys.exit(1)
+
+
+def pick(folder):
+    """Choose a picture with fzf, previewing it in the terminal."""
+    if not shutil.which("fzf"):
+        die("fzf is not installed; give a path instead: fetchpic PATH")
+    folder = os.path.expanduser(folder)
+    if not os.path.isdir(folder):
+        die("no such folder: " + folder)
+    files = []
+    for root, dirs, names in os.walk(folder):
+        dirs[:] = [d for d in dirs if not d.startswith(".")]
+        for n in names:
+            if n.lower().endswith(EXTS):
+                files.append(os.path.join(root, n))
+    if not files:
+        die("no pictures found in " + folder)
+    files.sort(key=lambda p: os.path.getmtime(p), reverse=True)     # newest first
+
+    preview = ("kitten icat --clear --transfer-mode=memory --stdin=no "
+               "--place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {} 2>/dev/null")
+    if not (shutil.which("kitten") and os.environ.get("KITTY_WINDOW_ID")):
+        preview = "file -b {}"
+    r = subprocess.run(
+        ["fzf", "--prompt", "fastfetch picture > ", "--height", "80%", "--layout", "reverse",
+         "--preview", preview, "--preview-window", "right,55%,border-left",
+         "--header", "enter: use it   esc: cancel   (newest first)"],
+        input="\n".join(files), text=True, stdout=subprocess.PIPE)
+    # Clear any preview picture left on screen.
+    if shutil.which("kitten") and os.environ.get("KITTY_WINDOW_ID"):
+        subprocess.run(["kitten", "icat", "--clear", "--stdin=no"], stderr=subprocess.DEVNULL)
+    choice = r.stdout.strip()
+    if not choice:
+        print("cancelled")
+        sys.exit(0)
+    return choice
+
+
+def mode():
+    """'gif' when fastfetch is set to play logo.gif, else 'png'."""
+    try:
+        return "gif" if '"kitty-icat"' in open(CONF).read() else "png"
+    except OSError:
+        return "png"
+
+
+def set_mode(kind):
+    """Point the fastfetch config at the still picture or at the animated one.
+
+    Only the type and source lines of the logo block are touched; the first
+    match of each is the logo's, because the logo block comes first.
+    """
+    try:
+        s = open(CONF).read()
+    except OSError:
+        return
+    typ, src = ("kitty-icat", "~/.config/fastfetch/logo.gif") if kind == "gif" \
+        else ("kitty-direct", "~/.config/fastfetch/logo.png")
+    s = re.sub(r'("type":\s*)"kitty-(?:direct|icat)"', lambda m: m.group(1) + '"' + typ + '"', s, count=1)
+    s = re.sub(r'("source":\s*)"[^"]*"', lambda m: m.group(1) + '"' + src + '"', s, count=1)
+    tmp = CONF + ".tmp"
+    with open(tmp, "w") as fh:
+        fh.write(s)
+    os.replace(tmp, CONF)
+
+
+def keep_current():
+    """Copy the current logo into history so --undo can bring it back."""
+    if not os.path.isfile(LOGO):
+        return
+    os.makedirs(HIST, exist_ok=True)
+    stamp = time.strftime("logo-%Y%m%d-%H%M%S")
+    shutil.copy2(LOGO, os.path.join(HIST, stamp + ".png"))
+    # An animated logo is saved alongside its still, under the same stamp.
+    if mode() == "gif" and os.path.isfile(GIF):
+        shutil.copy2(GIF, os.path.join(HIST, stamp + ".gif"))
+
+
+def is_animated(path):
+    try:
+        from PIL import Image
+        with Image.open(path) as im:
+            return getattr(im, "n_frames", 1) > 1
+    except Exception:
+        return False
+
+
+def build_gif(src_path, focus, ink):
+    """Crop every frame square and save as logo.gif. Returns True if it worked."""
+    magick = shutil.which("magick") or shutil.which("convert")
+    if not magick:
+        return False
+    gravity = {"center": "Center", "left": "West", "right": "East",
+               "top": "North", "bottom": "South"}[focus]
+    from PIL import Image
+    with Image.open(src_path) as im:
+        side = min(im.size)
+    cmd = [magick, src_path, "-coalesce", "-gravity", gravity,
+           "-crop", "%dx%d+0+0" % (side, side), "+repage"]
+    if side > 360:
+        cmd += ["-resize", "360x360"]          # 300px on screen; keeps the file small
+    if ink:
+        cmd += ["-colorspace", "Gray"]
+    tmp = GIF + ".tmp.gif"
+    r = subprocess.run(cmd + ["-layers", "Optimize", tmp], capture_output=True)
+    if r.returncode != 0 or not os.path.isfile(tmp):
+        return False
+    os.replace(tmp, GIF)
+    return True
+
+
+def build(src_path, focus, ink):
+    try:
+        from PIL import Image, ImageDraw, ImageEnhance, ImageOps
+    except ImportError:
+        die("needs Pillow: sudo dnf install python3-pillow")
+    try:
+        im = Image.open(src_path)
+        im.seek(0)                              # first frame of a GIF
+        im = im.convert("RGBA")
+    except Exception as e:
+        die("cannot read %s (%s)" % (src_path, e))
+
+    # Flatten transparency onto black, then crop to a square.
+    bg = Image.new("RGBA", im.size, (0, 0, 0, 255))
+    im = Image.alpha_composite(bg, im).convert("RGB")
+    w, h = im.size
+    side = min(w, h)
+    x, y = (w - side) // 2, (h - side) // 2
+    if focus == "left":
+        x = 0
+    elif focus == "right":
+        x = w - side
+    elif focus == "top":
+        y = 0
+    elif focus == "bottom":
+        y = h - side
+    im = im.crop((x, y, x + side, y + side)).resize((SIZE, SIZE), Image.LANCZOS)
+
+    if ink:
+        g = ImageOps.autocontrast(ImageOps.grayscale(im), cutoff=1)
+        g = ImageEnhance.Contrast(g).enhance(1.2)
+        im = Image.merge("RGB", (g, g, g))
+    out = im.convert("RGBA")
+    if ink and os.path.isfile(SEAL):
+        s = SIZE // 5
+        seal = Image.open(SEAL).convert("RGBA").resize((s, s), Image.LANCZOS)
+        out.alpha_composite(seal, (26, SIZE - s - 26))
+
+    mask = Image.new("L", (SIZE, SIZE), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, SIZE - 1, SIZE - 1], radius=22, fill=255)
+    out.putalpha(mask)
+
+    os.makedirs(FF, exist_ok=True)
+    tmp = LOGO + ".tmp.png"
+    out.save(tmp)
+    os.replace(tmp, LOGO)
+
+
+def undo():
+    if not os.path.isdir(HIST):
+        die("nothing to undo")
+    saved = sorted(f for f in os.listdir(HIST) if f.endswith(".png"))
+    if not saved:
+        die("nothing to undo")
+    last = os.path.join(HIST, saved[-1])
+    os.replace(last, LOGO)
+    gif = last[:-4] + ".gif"
+    if os.path.isfile(gif):
+        os.replace(gif, GIF)
+        set_mode("gif")
+    else:
+        set_mode("png")
+    print("restored " + saved[-1])
+
+
+def main():
+    ap = argparse.ArgumentParser(prog="fetchpic", description="Change the picture fastfetch shows.")
+    ap.add_argument("path", nargs="?", help="picture to use; leave out to pick one")
+    ap.add_argument("--dir", default="~/Pictures", help="folder to pick from (default ~/Pictures)")
+    ap.add_argument("--focus", default="center", choices=["center", "left", "right", "top", "bottom"],
+                    help="which part to keep when cropping square")
+    ap.add_argument("--ink", action="store_true", help="black-and-white with the seal")
+    ap.add_argument("--undo", action="store_true", help="go back to the previous picture")
+    ap.add_argument("--list", action="store_true", help="list saved pictures")
+    ap.add_argument("--quiet", action="store_true", help="do not run fastfetch afterwards")
+    a = ap.parse_args()
+
+    if a.list:
+        if os.path.isdir(HIST):
+            for f in sorted(os.listdir(HIST)):
+                print(os.path.join(HIST, f))
+        return
+    if a.undo:
+        undo()
+    else:
+        src = os.path.expanduser(a.path) if a.path else pick(a.dir)
+        if not os.path.isfile(src):
+            die("no such file: " + src)
+        keep_current()
+        # The still is always written: it is the preview, and the fallback.
+        build(src, a.focus, a.ink)
+        if is_animated(src) and build_gif(src, a.focus, a.ink):
+            set_mode("gif")
+            print("fastfetch picture (animated): " + src)
+        else:
+            set_mode("png")
+            print("fastfetch picture: " + src)
+
+    if not a.quiet and shutil.which("fastfetch") and sys.stdout.isatty():
+        subprocess.run(["fastfetch"])
+
+
+if __name__ == "__main__":
+    main()

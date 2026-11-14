@@ -1,0 +1,12 @@
+{
+  "name": "nord",
+  "label": "Nord",
+  "bg": "#2e3440",
+  "bg_alt": "#3b4252",
+  "fg": "#d8dee9",
+  "accent": "#88c0d0",
+  "accent_fg": "#2e3440",
+  "urgent": "#bf616a",
+  "border_active": "88c0d0ee",
+  "border_inactive": "3b4252aa"
+}

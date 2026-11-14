@@ -1,0 +1,131 @@
+# ~/.config/starship.toml — "Sadu" prompt
+# Two quiet lines: a diamond marker, the path, git, then the caret.
+# Colours are NOT set here by hand: apply-colors.sh rewrites the palette block
+# at the bottom of this file whenever the theme changes.
+# https://starship.rs/config/
+
+add_newline = true
+command_timeout = 1000
+scan_timeout = 30
+palette = "rice"
+
+format = """
+[◆](accent) $username$directory$git_branch$git_status$python$nodejs$rust$golang$package$jobs$fill$cmd_duration$time
+$character"""
+
+[username]
+show_always = false
+style_user  = "fg:dim"
+style_root  = "fg:red bold"
+format      = "[$user]($style) [·](line) "
+
+[directory]
+truncation_length = 3
+truncation_symbol = "…/"
+read_only         = " 󰌾"
+read_only_style   = "fg:red"
+style             = "fg:fg bold"
+format            = "[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+symbol            = "\ue0a0 "
+style             = "fg:gold"
+format            = "[◇](line) [$symbol$branch]($style) "
+truncation_length = 24
+truncation_symbol = "…"
+
+[git_status]
+style      = "fg:accent"
+format     = "([$all_status$ahead_behind]($style) )"
+conflicted = "="
+ahead      = "⇡${count}"
+behind     = "⇣${count}"
+diverged   = "⇕⇡${ahead_count}⇣${behind_count}"
+up_to_date = ""
+untracked  = "?${count}"
+stashed    = "\\$${count}"
+modified   = "!${count}"
+staged     = "+${count}"
+renamed    = "»${count}"
+deleted    = "✘${count}"
+
+[python]
+symbol = "\ue73c "
+style  = "fg:faint"
+format = "[◇](line) [${symbol}${pyenv_prefix}(${version})( \\($virtualenv\\))]($style) "
+
+[nodejs]
+symbol = "\ue718 "
+style  = "fg:faint"
+format = "[◇](line) [$symbol($version)]($style) "
+
+[rust]
+symbol = "\ue7a8 "
+style  = "fg:faint"
+format = "[◇](line) [$symbol($version)]($style) "
+
+[golang]
+symbol = "\ue627 "
+style  = "fg:faint"
+format = "[◇](line) [$symbol($version)]($style) "
+
+[package]
+disabled = true
+
+[jobs]
+symbol    = "✦"
+style     = "fg:cyan"
+format    = "[$symbol$number]($style) "
+threshold = 1
+
+[fill]
+symbol = " "
+
+[cmd_duration]
+min_time          = 500
+show_milliseconds = false
+style             = "fg:faint"
+format            = "[$duration]($style) [·](line) "
+
+[time]
+disabled    = false
+time_format = "%H:%M"
+style       = "fg:dim"
+format      = "[$time]($style)"
+
+[character]
+success_symbol = "[❯](bold fg:accent)"
+error_symbol   = "[❯](bold fg:red)"
+vimcmd_symbol  = "[❮](bold fg:gold)"
+
+[line_break]
+disabled = false
+
+[battery]
+disabled = true
+
+[status]
+disabled = true
+
+[hostname]
+disabled = true
+
+# The block between the markers is generated. Edit apply-colors.sh, not this.
+# >>> rice palette
+[palettes.rice]
+accent    = "#86734b"
+accent_fg = "#fff9ee"
+gold      = "#99a6b0"
+rose      = "#c8c6c3"
+red       = "#ffb3b0"
+green     = "#72b751"
+blue      = "#00b5db"
+cyan      = "#00bba1"
+fg        = "#e3e2e1"
+dim       = "#c8c6c3"
+faint     = "#92908e"
+line      = "#484644"
+bg        = "#141312"
+bg2       = "#2a2a29"
+bg3       = "#353534"
+# <<< rice palette

@@ -1,0 +1,12 @@
+{
+  "name": "catppuccin",
+  "label": "Catppuccin Mocha",
+  "bg": "#1e1e2e",
+  "bg_alt": "#313244",
+  "fg": "#cdd6f4",
+  "accent": "#cba6f7",
+  "accent_fg": "#1e1e2e",
+  "urgent": "#f38ba8",
+  "border_active": "cba6f7ee",
+  "border_inactive": "313244aa"
+}

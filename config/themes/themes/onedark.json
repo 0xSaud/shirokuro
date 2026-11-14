@@ -1,0 +1,12 @@
+{
+  "name": "onedark",
+  "label": "One Dark",
+  "bg": "#282c34",
+  "bg_alt": "#3b4048",
+  "fg": "#abb2bf",
+  "accent": "#61afef",
+  "accent_fg": "#282c34",
+  "urgent": "#e06c75",
+  "border_active": "61afefee",
+  "border_inactive": "3b4048aa"
+}

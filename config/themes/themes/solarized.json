@@ -1,0 +1,12 @@
+{
+  "name": "solarized",
+  "label": "Solarized Dark",
+  "bg": "#002b36",
+  "bg_alt": "#073642",
+  "fg": "#93a1a1",
+  "accent": "#268bd2",
+  "accent_fg": "#002b36",
+  "urgent": "#dc322f",
+  "border_active": "268bd2ee",
+  "border_inactive": "073642aa"
+}

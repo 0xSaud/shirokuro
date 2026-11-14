@@ -1,0 +1,12 @@
+{
+  "name": "kanagawa",
+  "label": "Kanagawa",
+  "bg": "#1f1f28",
+  "bg_alt": "#2a2a37",
+  "fg": "#dcd7ba",
+  "accent": "#7e9cd8",
+  "accent_fg": "#1f1f28",
+  "urgent": "#e82424",
+  "border_active": "7e9cd8ee",
+  "border_inactive": "2a2a37aa"
+}

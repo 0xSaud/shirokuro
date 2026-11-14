@@ -1,0 +1,12 @@
+{
+  "name": "cyber",
+  "label": "Cyberpunk",
+  "bg": "#0a0e1a",
+  "bg_alt": "#16213e",
+  "fg": "#e0e6f0",
+  "accent": "#00d9ff",
+  "accent_fg": "#0a0e1a",
+  "urgent": "#ff2e63",
+  "border_active": "00d9ffee",
+  "border_inactive": "16213eaa"
+}
