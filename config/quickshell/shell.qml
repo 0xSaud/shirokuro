@@ -450,7 +450,7 @@ ShellRoot {
         id: winLister
         running: true
         command: ["bash", "-c",
-            "hyprctl clients -j | jq -r '.[] | select(.mapped==true) | select(.workspace.id > 0) | " +
+            "hyprctl clients -j | jq -r '.[] | select(.mapped==true) | select(.workspace.id > 0 or .workspace.name == \"special:bg\") | " +
             "[.address, (.pid|tostring), (.workspace.id|tostring), (.focusHistoryID|tostring), " +
             ".class, .title, ((.at[0] + .size[0] / 2)|floor|tostring), " +
             "((.at[1] + .size[1] / 2)|floor|tostring)] | @tsv'"]
@@ -536,6 +536,10 @@ ShellRoot {
     // mouse still.
     function focusWin(w) {
         if (!w) return
+        // A window hidden by SUPER+C (close-window.sh parks background apps
+        // such as Spotify on special:bg) is brought back to this workspace.
+        if (w.ws < 0 && Hyprland.focusedWorkspace)
+            Hyprland.dispatch("movetoworkspace " + Hyprland.focusedWorkspace.id + ",address:" + w.addr)
         Hyprland.dispatch("focuswindow address:" + w.addr)
         // Geometry comes from winMeta rather than the list record so a window
         // that has been moved or resized since is still warped to accurately.

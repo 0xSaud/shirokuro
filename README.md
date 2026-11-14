@@ -52,7 +52,7 @@ Wallpapers and GIFs are not included. Put your own in `~/Pictures/Wallpapers` an
 |---|---|
 | `SUPER + Q` | Terminal |
 | `SUPER + E` | Files |
-| `SUPER + C` | Close window |
+| `SUPER + C` | Close window (Spotify is hidden instead and keeps playing) |
 | `SUPER + F` / `V` | Fullscreen / float |
 | `SUPER + H J K L` | Move focus |
 | `SUPER + 1…9, 0` | Workspace 1–10 |
@@ -136,6 +136,7 @@ Wallpapers and GIFs are not included. Put your own in `~/Pictures/Wallpapers` an
 
 ## Notes
 
+- `SUPER + C` on Spotify hides it instead of closing it. Its icon stays on the bar: click to bring it back, right-click → Quit to close it. Add more apps in `config/hypr/scripts/close-window.sh`.
 - Workspace numbers are kanji. For normal digits: Settings → Look.
 - Power profiles (Eco / Balanced / Turbo) need `tuned-ppd`.
 - More detail on how things fit together is in [`config/hypr/RICE.md`](config/hypr/RICE.md).
