@@ -1,6 +1,6 @@
-# Ink
+# 白黒 shirokuro
 
-My Hyprland setup. Black, white and grey with one accent colour. The bar, launcher, panels and notifications are all written in QML with [Quickshell](https://quickshell.org).
+My Hyprland setup. *Shirokuro* means black and white: that, plus grey and one accent colour. The bar, launcher, panels and notifications are all written in QML with [Quickshell](https://quickshell.org).
 
 ![Desktop](screenshots/01-desktop.png)
 
@@ -11,8 +11,8 @@ Fedora 43 · Hyprland · Quickshell · kitty · zsh + starship · fastfetch
 You need Hyprland and Quickshell already installed.
 
 ```bash
-git clone https://github.com/0xSaud/ink-rice.git
-cd ink-rice
+git clone https://github.com/0xSaud/shirokuro.git
+cd shirokuro
 
 # back up what you have
 mkdir -p ~/rice-backup
